@@ -16,9 +16,10 @@ interface ProjectListProps {
   projects: Project[];
   isLoading: boolean;
   onDelete: (id: number) => void;
+  onRun: (project: Project) => void;
 }
 
-export function ProjectList({ projects, isLoading, onDelete }: ProjectListProps) {
+export function ProjectList({ projects, isLoading, onDelete, onRun }: ProjectListProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   if (isLoading) {
@@ -65,6 +66,7 @@ export function ProjectList({ projects, isLoading, onDelete }: ProjectListProps)
             project={project}
             onView={setSelectedProject}
             onDelete={onDelete}
+            onRun={onRun}
           />
         ))}
       </div>

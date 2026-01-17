@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Code2, Clock, Trash2, Eye } from "lucide-react";
+import { Play, Code2, Clock, Trash2, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Project } from "@shared/schema";
 import { formatDistanceToNow } from "date-fns";
@@ -11,9 +11,10 @@ interface ProjectCardProps {
   project: Project;
   onView: (project: Project) => void;
   onDelete: (id: number) => void;
+  onRun: (project: Project) => void;
 }
 
-export function ProjectCard({ project, onView, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, onView, onDelete, onRun }: ProjectCardProps) {
   const statusColors: Record<string, string> = {
     generating: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
     completed: "bg-green-500/10 text-green-600 dark:text-green-400",
@@ -75,10 +76,12 @@ export function ProjectCard({ project, onView, onDelete }: ProjectCardProps) {
             variant="outline"
             size="sm"
             className="gap-1.5"
-            onClick={() => window.open(project.url, "_blank")}
-            data-testid={`button-open-project-${project.id}`}
+            onClick={() => onRun(project)}
+            disabled={project.status !== "completed"}
+            data-testid={`button-run-project-${project.id}`}
           >
-            <ExternalLink className="h-4 w-4" />
+            <Play className="h-4 w-4" />
+            Executar
           </Button>
           <Button
             variant="ghost"

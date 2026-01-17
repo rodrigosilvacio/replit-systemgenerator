@@ -95,6 +95,74 @@ export default function Home() {
     });
   };
 
+  const handleRunProject = (project: Project) => {
+    const language = project.language.toLowerCase();
+    const code = project.generatedCode;
+
+    if (language.includes("html") || language.includes("javascript") || language.includes("react")) {
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        if (language.includes("html")) {
+          newWindow.document.write(code);
+          newWindow.document.close();
+        } else {
+          const htmlWrapper = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${project.name}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+    #output { background: #f5f5f5; padding: 15px; border-radius: 8px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>${project.name}</h2>
+  <div id="output"></div>
+  <script>
+    const originalLog = console.log;
+    console.log = function(...args) {
+      const output = document.getElementById('output');
+      output.innerHTML += args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' ') + '\\n';
+      originalLog.apply(console, args);
+    };
+    try {
+      ${code}
+    } catch(e) {
+      document.getElementById('output').innerHTML += 'Erro: ' + e.message;
+    }
+  </script>
+</body>
+</html>`;
+          newWindow.document.write(htmlWrapper);
+          newWindow.document.close();
+        }
+        toast({
+          title: "Código executado!",
+          description: "Uma nova janela foi aberta com o resultado.",
+        });
+      } else {
+        toast({
+          title: "Pop-up bloqueado",
+          description: "Permita pop-ups neste site para executar o código.",
+          variant: "destructive",
+        });
+      }
+    } else if (language.includes("python")) {
+      toast({
+        title: "Executar Python",
+        description: "Copie o código e execute em um ambiente Python local ou no Replit.",
+      });
+    } else {
+      toast({
+        title: "Execução não disponível",
+        description: `Para executar ${project.language}, copie o código e use um ambiente de desenvolvimento apropriado.`,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -160,6 +228,7 @@ export default function Home() {
               projects={projects}
               isLoading={projectsLoading}
               onDelete={(id) => deleteMutation.mutate(id)}
+              onRun={handleRunProject}
             />
           </div>
         </div>
