@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, ExternalLink, Code2, FileCode } from "lucide-react";
+import { Copy, Check, ExternalLink, Code2, FileCode, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import type { Project } from "@shared/schema";
 
 interface CodePreviewProps {
@@ -12,11 +13,23 @@ interface CodePreviewProps {
 
 export function CodePreview({ project }: CodePreviewProps) {
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(project.generatedCode);
     setCopied(true);
+    toast({
+      title: "Copiado!",
+      description: "O código foi copiado para a área de transferência.",
+    });
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenUrl = () => {
+    toast({
+      title: "URL Demonstrativa",
+      description: "Esta é uma URL simulada. Para publicar seu sistema, copie o código e crie um novo projeto no Replit.",
+    });
   };
 
   const codeLines = project.generatedCode.split("\n");
@@ -55,7 +68,7 @@ export function CodePreview({ project }: CodePreviewProps) {
             variant="outline"
             size="sm"
             className="gap-1.5"
-            onClick={() => window.open(project.url, "_blank")}
+            onClick={handleOpenUrl}
             data-testid="button-open-url"
           >
             <ExternalLink className="h-4 w-4" />
